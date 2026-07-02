@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post-Stroke Rehab Visual Dashboard & Progress Form</title>
+    <title>30-Day Post-Stroke Rehab Visual Dashboard</title>
     <!-- Tailwind CSS for modern responsive styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js for beautiful interactive analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- FontAwesome for medical & clinical iconography -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font: Inter for clean, legible clinical typography -->
+    <!-- Google Font: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -21,55 +21,46 @@
             scroll-behavior: smooth;
         }
         
-        /* Custom scrollbar styling for a premium feel */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         /* Glassmorphism background highlights */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(226, 232, 240, 0.8);
         }
 
-        /* Custom print-specific layout optimization */
+        /* Editable fields highlight on hover (hidden in print) */
+        .editable {
+            transition: all 0.2s ease;
+            border-radius: 4px;
+        }
+        @media screen {
+            .editable:hover {
+                background-color: #f8fafc;
+                outline: 2px dashed #94a3b8;
+                cursor: text;
+            }
+            .editable:focus {
+                background-color: #fff;
+                outline: 2px solid #0d9488;
+                cursor: text;
+            }
+        }
+
+        /* Print optimizations */
         @media print {
-            body {
-                background: white !important;
-                color: black !important;
-                font-size: 11pt !important;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .print-full-width {
-                width: 100% !important;
-                max-width: 100% !important;
-                flex: none !important;
-            }
-            .page-break {
-                page-break-before: always;
-            }
-            .card-shadow {
-                box-shadow: none !important;
-                border: 1px solid #e2e8f0 !important;
-            }
-            canvas {
-                max-width: 100% !important;
-                height: auto !important;
-            }
+            body { background: white !important; color: black !important; font-size: 11pt !important; }
+            .no-print { display: none !important; }
+            .print-full-width { width: 100% !important; max-width: 100% !important; flex: none !important; }
+            .page-break { page-break-before: always; }
+            .card-shadow { box-shadow: none !important; border: 1px solid #e2e8f0 !important; }
+            canvas { max-width: 100% !important; height: auto !important; }
+            .editable { outline: none !important; }
         }
     </style>
 </head>
@@ -87,14 +78,14 @@
                         Post-Stroke Rehab Dashboard
                         <span class="text-xs bg-teal-100 text-teal-800 font-medium px-2.5 py-0.5 rounded-full">Active Cycle 1</span>
                     </h1>
-                    <p class="text-xs text-slate-500">Early Post-Acute Home-Based Progress Tracker</p>
+                    <p class="text-xs text-slate-500">30-Day Post-Acute Home-Based Progress Tracker (Click any text to edit)</p>
                 </div>
             </div>
             <div class="flex items-center gap-2.5 w-full md:w-auto justify-end">
                 <button onclick="window.print()" class="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4.5 py-2.5 rounded-xl transition shadow-md shadow-slate-200 cursor-pointer">
                     <i class="fa-solid fa-print"></i> Print Clinical Report
                 </button>
-                <button onclick="showToast('Data exported successfully!', 'success')" class="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-sm font-semibold px-4.5 py-2.5 rounded-xl transition cursor-pointer">
+                <button onclick="showToast('Data exported successfully! Note: Use Print -> Save as PDF to capture all your typed edits.')" class="flex-1 md:flex-none flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-sm font-semibold px-4.5 py-2.5 rounded-xl transition cursor-pointer">
                     <i class="fa-solid fa-file-export"></i> Export JSON
                 </button>
             </div>
@@ -104,7 +95,7 @@
     <!-- Main Container Grid -->
     <main class="max-w-7xl mx-auto px-4 md:px-6 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6 print-full-width">
         
-        <!-- LEFT COLUMN: Client Profiles & Data Entry Form Controls (Sidebar - hidden during print) -->
+        <!-- LEFT COLUMN: Client Profiles & Data Entry Form Controls -->
         <section class="lg:col-span-4 space-y-6 no-print">
             <!-- Clinician & Patient Metadata Form -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-5">
@@ -140,7 +131,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 mb-1">Report Date</label>
-                        <input type="date" id="reportDate" value="2026-06-14" oninput="updateReportMetaData()" class="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
+                        <input type="date" id="reportDate" value="2026-06-30" oninput="updateReportMetaData()" class="w-full text-sm border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition">
                     </div>
                 </div>
             </div>
@@ -150,62 +141,61 @@
                 <h2 class="text-base font-bold text-slate-900 flex items-center gap-2 pb-3 border-b border-slate-100">
                     <i class="fa-solid fa-sliders text-teal-600"></i> Dynamic Metrics Tuner
                 </h2>
-                <p class="text-xs text-slate-500 leading-relaxed">Modify measurements on-the-fly to update live graphs and objective data tables below.</p>
+                <p class="text-xs text-slate-500 leading-relaxed">Modify measurements to update live graphs and objective data tables instantly.</p>
                 
                 <div class="space-y-4 pt-2">
                     <div>
                         <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>L. Shoulder Flexion (Day 14)</span>
-                            <span class="font-bold text-teal-600" id="valShoulderDeg">85°</span>
+                            <span>L. Shoulder Flexion (Day 30)</span>
+                            <span class="font-bold text-teal-600" id="valShoulderDeg">110°</span>
                         </div>
-                        <input type="range" id="sliderShoulder" min="45" max="180" value="85" oninput="updateChartAndTable()" class="w-full accent-teal-600 h-1.5 bg-slate-100 rounded-lg cursor-pointer">
+                        <input type="range" id="sliderShoulder" min="45" max="180" value="110" oninput="updateChartAndTable()" class="w-full accent-teal-600 h-1.5 bg-slate-100 rounded-lg cursor-pointer">
                     </div>
 
                     <div>
                         <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>L. Hip Flexion MMT (Day 14)</span>
-                            <span class="font-bold text-teal-600" id="valHipMMT">2/5</span>
+                            <span>L. Hip Flexion MMT (Day 30)</span>
+                            <span class="font-bold text-teal-600" id="valHipMMT">3/5</span>
                         </div>
-                        <input type="range" id="sliderHip" min="1" max="5" step="0.5" value="2" oninput="updateChartAndTable()" class="w-full accent-teal-600 h-1.5 bg-slate-100 rounded-lg cursor-pointer">
+                        <input type="range" id="sliderHip" min="1" max="5" step="0.5" value="3" oninput="updateChartAndTable()" class="w-full accent-teal-600 h-1.5 bg-slate-100 rounded-lg cursor-pointer">
                     </div>
 
                     <div>
                         <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>L. Shoulder Flexion MMT (Day 14)</span>
-                            <span class="font-bold text-teal-600" id="valShoulderMMT">2/5</span>
+                            <span>L. Shoulder MMT (Day 30)</span>
+                            <span class="font-bold text-teal-600" id="valShoulderMMT">3/5</span>
                         </div>
-                        <input type="range" id="sliderShoulderMMT" min="1" max="5" step="0.5" value="2" oninput="updateChartAndTable()" class="w-full accent-teal-600 h-1.5 bg-slate-100 rounded-lg cursor-pointer">
+                        <input type="range" id="sliderShoulderMMT" min="1" max="5" step="0.5" value="3" oninput="updateChartAndTable()" class="w-full accent-teal-600 h-1.5 bg-slate-100 rounded-lg cursor-pointer">
                     </div>
 
                     <div>
                         <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                            <span>Bilateral Bridging Hold (Sec)</span>
-                            <span class="font-bold text-teal-600" id="valBridgeHold">5s</span>
+                            <span>Bilateral Bridge Hold (Sec)</span>
+                            <span class="font-bold text-teal-600" id="valBridgeHold">15s</span>
                         </div>
-                        <input type="range" id="sliderBridge" min="0" max="30" value="5" oninput="updateChartAndTable()" class="w-full accent-teal-600 h-1.5 bg-slate-100 rounded-lg cursor-pointer">
+                        <input type="range" id="sliderBridge" min="0" max="60" value="15" oninput="updateChartAndTable()" class="w-full accent-teal-600 h-1.5 bg-slate-100 rounded-lg cursor-pointer">
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- RIGHT COLUMN: Visual Report Output (This matches the Markdown and renders beautifully on screen and print) -->
-        <article class="lg:col-span-8 space-y-6 print-full-width">
+        <!-- RIGHT COLUMN: Visual Report Output -->
+        <article class="lg:col-span-8 space-y-6 print-full-width" id="reportDocument">
             
-            <!-- Clinical Header Layout for Printed Form -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8 space-y-6 card-shadow relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-2 h-full bg-teal-600"></div>
                 
-                <!-- Clinical Header (Visible always, customized for document output) -->
+                <!-- Clinical Header -->
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-150 pb-6 gap-4">
                     <div>
-                        <span class="text-[10px] font-extrabold uppercase tracking-widest text-teal-600">Exercise Physiology Report</span>
-                        <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 mt-1 uppercase">14-Day Progress Evaluation</h1>
-                        <p class="text-sm text-slate-500 mt-1">Bed-Based Neuromuscular Post-Rehabilitation</p>
+                        <span class="text-[10px] font-extrabold uppercase tracking-widest text-teal-600 editable" contenteditable="true">Exercise Physiology Report</span>
+                        <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 mt-1 uppercase editable" contenteditable="true">30-Day Progress Evaluation</h1>
+                        <p class="text-sm text-slate-500 mt-1 editable" contenteditable="true">Bed-Based Neuromuscular Post-Rehabilitation</p>
                     </div>
                     <div class="text-left md:text-right text-xs space-y-1">
-                        <p class="text-slate-500">Date: <strong class="text-slate-800" id="printReportDate">June 14, 2026</strong></p>
-                        <p class="text-slate-500">Period: <strong class="text-slate-800">June 1 - June 14, 2026</strong></p>
-                        <p class="text-slate-500">Status: <strong class="text-amber-600 font-semibold">Post-Acute Cycle 1</strong></p>
+                        <p class="text-slate-500">Date: <strong class="text-slate-800" id="printReportDate">June 30, 2026</strong></p>
+                        <p class="text-slate-500">Period: <strong class="text-slate-800 editable" contenteditable="true">June 1 - June 30, 2026</strong></p>
+                        <p class="text-slate-500">Status: <strong class="text-amber-600 font-semibold editable" contenteditable="true">Post-Acute Cycle 1</strong></p>
                     </div>
                 </div>
 
@@ -229,37 +219,37 @@
                     </div>
                 </div>
 
-                <!-- Section 1: Executive Summary & Clinical Goals -->
+                <!-- Section 1: Executive Summary -->
                 <div class="space-y-4">
-                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide border-b border-slate-100 pb-2">
-                        <span class="w-5 h-5 bg-teal-50 text-teal-600 rounded-md flex items-center justify-center font-bold text-xs">1</span>
+                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide border-b border-slate-100 pb-2 editable" contenteditable="true">
+                        <span class="w-5 h-5 bg-teal-50 text-teal-600 rounded-md flex items-center justify-center font-bold text-xs" contenteditable="false">1</span>
                         Executive Summary & Clinical Goals
                     </h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Esther Limo was referred for home-based exercise physiology intervention following discharge from acute hospital care. Due to her physical status, the initial 14-day cycle focused strictly on <strong>bed-based exercise protocols</strong>. The clinical objectives aimed to manage left-side flaccidity, prevent joint contractures/shoulder subluxation, combat bed-rest deconditioning, and build foundational core/limb strength necessary for future seated and upright mobility.
+                    <p class="text-xs text-slate-600 leading-relaxed editable" contenteditable="true">
+                        Esther Limo was referred for home-based exercise physiology intervention following discharge from acute hospital care. The initial 30-day cycle focused strictly on <strong>bed-based exercise protocols</strong> and transition to edge-of-bed stability. The clinical objectives aimed to manage left-side flaccidity, prevent joint contractures, combat bed-rest deconditioning, and build foundational core/limb strength necessary for upcoming seated and upright mobility.
                     </p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mt-2">
                         <div class="p-3 border border-slate-100 hover:border-slate-200 rounded-xl transition flex gap-3 items-start bg-slate-50/50">
                             <i class="fa-solid fa-brain text-teal-600 text-sm mt-0.5"></i>
                             <div>
-                                <h4 class="text-xs font-bold text-slate-800">Neuromuscular Facilitation</h4>
-                                <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Stimulating voluntary motor recruitment and proprioceptive pathways in the left upper limb (LUL) and left lower limb (LLL).</p>
+                                <h4 class="text-xs font-bold text-slate-800 editable" contenteditable="true">Neuromuscular Facilitation</h4>
+                                <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed editable" contenteditable="true">Stimulating voluntary motor recruitment and proprioceptive pathways in the left upper limb (LUL) and left lower limb (LLL).</p>
                             </div>
                         </div>
                         <div class="p-3 border border-slate-100 hover:border-slate-200 rounded-xl transition flex gap-3 items-start bg-slate-50/50">
                             <i class="fa-solid fa-bed text-teal-600 text-sm mt-0.5"></i>
                             <div>
-                                <h4 class="text-xs font-bold text-slate-800">Bed Mobility Mastery</h4>
-                                <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Training core-driven rotational elements (bilateral rolling) and pelvic mechanics to ease caregiver strain.</p>
+                                <h4 class="text-xs font-bold text-slate-800 editable" contenteditable="true">Bed Mobility Mastery</h4>
+                                <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed editable" contenteditable="true">Training core-driven rotational elements (bilateral rolling) and pelvic mechanics to ease caregiver strain and prepare for sitting.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Section 2: 14-Day Timeline -->
+                <!-- Section 2: 30-Day Timeline -->
                 <div class="space-y-4 page-break">
-                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide border-b border-slate-100 pb-2">
-                        <span class="w-5 h-5 bg-teal-50 text-teal-600 rounded-md flex items-center justify-center font-bold text-xs">2</span>
+                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide border-b border-slate-100 pb-2 editable" contenteditable="true">
+                        <span class="w-5 h-5 bg-teal-50 text-teal-600 rounded-md flex items-center justify-center font-bold text-xs" contenteditable="false">2</span>
                         Rehabilitation Progress Timeline
                     </h3>
                     
@@ -271,10 +261,10 @@
                             </span>
                             <div class="space-y-1">
                                 <div class="flex justify-between items-center">
-                                    <h4 class="text-xs font-extrabold text-slate-800 uppercase">Phase 1: ROM & Activation</h4>
-                                    <span class="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">Days 1 - 5</span>
+                                    <h4 class="text-xs font-extrabold text-slate-800 uppercase editable" contenteditable="true">Phase 1: ROM & Activation</h4>
+                                    <span class="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full editable" contenteditable="true">Days 1 - 10</span>
                                 </div>
-                                <p class="text-[11px] text-slate-500 leading-relaxed">
+                                <p class="text-[11px] text-slate-500 leading-relaxed editable" contenteditable="true">
                                     <strong>Baseline & Mobility Init:</strong> Identified flaccidity and spatial neglect in LUL/LLL. Commenced passive ROM and tactile/verbal prompts. Rolled to right with 75% therapist effort; unable to roll to the left.
                                 </p>
                             </div>
@@ -286,11 +276,11 @@
                             </span>
                             <div class="space-y-1">
                                 <div class="flex justify-between items-center">
-                                    <h4 class="text-xs font-extrabold text-slate-800 uppercase">Phase 2: Core & Guided Mobility</h4>
-                                    <span class="text-[10px] font-bold bg-teal-100 text-slate-500 px-2 py-0.5 rounded-full">Days 6 - 10</span>
+                                    <h4 class="text-xs font-extrabold text-slate-800 uppercase editable" contenteditable="true">Phase 2: Core & Guided Mobility</h4>
+                                    <span class="text-[10px] font-bold bg-teal-100 text-slate-500 px-2 py-0.5 rounded-full editable" contenteditable="true">Days 11 - 20</span>
                                 </div>
-                                <p class="text-[11px] text-slate-500 leading-relaxed">
-                                    <strong>Midpoint Checkpoint:</strong> Introduced pelvic bridging with manual knee stabilization. Progressed rolling to right to Moderate Assist (50% effort) with active core rotation during roll.
+                                <p class="text-[11px] text-slate-500 leading-relaxed editable" contenteditable="true">
+                                    <strong>Midpoint Checkpoint:</strong> Introduced pelvic bridging with manual knee stabilization. Progressed rolling to right to Moderate Assist (50% effort) with active core rotation. Patient began initiating left side movement.
                                 </p>
                             </div>
                         </div>
@@ -301,11 +291,11 @@
                             </span>
                             <div class="space-y-1">
                                 <div class="flex justify-between items-center">
-                                    <h4 class="text-xs font-extrabold text-slate-800 uppercase">Phase 3: Autonomy Consolidation</h4>
-                                    <span class="text-[10px] font-bold bg-teal-600 text-white px-2 py-0.5 rounded-full">Days 11 - 14</span>
+                                    <h4 class="text-xs font-extrabold text-slate-800 uppercase editable" contenteditable="true">Phase 3: Autonomy Consolidation</h4>
+                                    <span class="text-[10px] font-bold bg-teal-600 text-white px-2 py-0.5 rounded-full editable" contenteditable="true">Days 21 - 30</span>
                                 </div>
-                                <p class="text-[11px] text-slate-500 leading-relaxed">
-                                    <strong>Target Accomplished:</strong> Achieved independent static hold of bridging for 5s. Assisted active lower limb exercises. Initiated ankle dorsiflexion paired with quick-stretch to correct drop foot risk.
+                                <p class="text-[11px] text-slate-500 leading-relaxed editable" contenteditable="true">
+                                    <strong>Target Accomplished:</strong> Achieved independent static hold of bridging for 15s. Assisted active lower limb exercises. Initiated ankle dorsiflexion paired with quick-stretch to correct drop foot risk. Patient successfully sat at edge of bed with Min Assist.
                                 </p>
                             </div>
                         </div>
@@ -314,22 +304,22 @@
 
                 <!-- Section 3: Summary of Progress & Visual Charts -->
                 <div class="space-y-5 page-break">
-                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide border-b border-slate-100 pb-2">
-                        <span class="w-5 h-5 bg-teal-50 text-teal-600 rounded-md flex items-center justify-center font-bold text-xs">3</span>
+                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide border-b border-slate-100 pb-2 editable" contenteditable="true">
+                        <span class="w-5 h-5 bg-teal-50 text-teal-600 rounded-md flex items-center justify-center font-bold text-xs" contenteditable="false">3</span>
                         Objective Metrics & Progress Charts
                     </h3>
 
                     <!-- Analytics Graph Container -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-150">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-2">Motor Recruitment Progression (MMT)</span>
-                            <div class="h-44 flex items-center justify-center">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-2 editable" contenteditable="true">Motor Recruitment Progression (MMT)</span>
+                            <div class="h-44 flex items-center justify-center relative">
                                 <canvas id="chartMMT"></canvas>
                             </div>
                         </div>
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-150">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-2">Left Shoulder Flexion (AAROM Degrees)</span>
-                            <div class="h-44 flex items-center justify-center">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block mb-2 editable" contenteditable="true">Left Shoulder Flexion (AAROM Degrees)</span>
+                            <div class="h-44 flex items-center justify-center relative">
                                 <canvas id="chartROM"></canvas>
                             </div>
                         </div>
@@ -340,429 +330,302 @@
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold">
-                                    <th class="p-3">Bed-Based Metric</th>
-                                    <th class="p-3 text-center">Baseline (Day 1)</th>
-                                    <th class="p-3 text-center">Midpoint (Day 7)</th>
-                                    <th class="p-3 text-center bg-teal-50 text-teal-900">Current (Day 14)</th>
-                                    <th class="p-3">Clinical Evaluation Notes</th>
+                                    <th class="p-3 editable" contenteditable="true">Bed-Based Metric</th>
+                                    <th class="p-3 text-center editable" contenteditable="true">Baseline (Day 1)</th>
+                                    <th class="p-3 text-center editable" contenteditable="true">Midpoint (Day 15)</th>
+                                    <th class="p-3 text-center bg-teal-50 text-teal-900 editable" contenteditable="true">Current (Day 30)</th>
+                                    <th class="p-3 editable" contenteditable="true">Clinical Evaluation Notes (Click to edit)</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100 text-[11px] text-slate-600">
+                            <tbody class="divide-y divide-slate-100 text-[11px] text-slate-600" id="metricsTableBody">
                                 <tr>
-                                    <td class="p-3 font-semibold text-slate-850">Left Shoulder Flexion (AAROM)</td>
-                                    <td class="p-3 text-center text-slate-500">45°</td>
-                                    <td class="p-3 text-center text-slate-500">65°</td>
-                                    <td class="p-3 text-center bg-teal-50 text-teal-700 font-bold" id="tdShoulderFlex">85°</td>
-                                    <td class="p-3">Noticeably improved passive elevation in supine; free of scapular tracking pain.</td>
+                                    <td class="p-3 font-semibold text-slate-850 editable" contenteditable="true">Left Shoulder Flexion (AAROM)</td>
+                                    <td class="p-3 text-center text-slate-500 editable" contenteditable="true">45°</td>
+                                    <td class="p-3 text-center text-slate-500 editable" contenteditable="true">75°</td>
+                                    <td class="p-3 text-center bg-teal-50 text-teal-700 font-bold" id="tdShoulderFlex">110°</td>
+                                    <td class="p-3 editable" contenteditable="true">Noticeably improved passive elevation in supine; free of scapular tracking pain.</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-3 font-semibold text-slate-850">Left Hip Flexion (MMT Scale)</td>
-                                    <td class="p-3 text-center text-slate-500">1/5 (Trace)</td>
-                                    <td class="p-3 text-center text-slate-500">2/5 (Gravity Eliminated)</td>
-                                    <td class="p-3 text-center bg-teal-50 text-teal-700 font-bold" id="tdHipMMT">2/5</td>
-                                    <td class="p-3">Enhanced core engagement and proximal quad activation during guided heel slides.</td>
+                                    <td class="p-3 font-semibold text-slate-850 editable" contenteditable="true">Left Hip Flexion (MMT Scale)</td>
+                                    <td class="p-3 text-center text-slate-500 editable" contenteditable="true">1/5 (Trace)</td>
+                                    <td class="p-3 text-center text-slate-500 editable" contenteditable="true">2/5</td>
+                                    <td class="p-3 text-center bg-teal-50 text-teal-700 font-bold" id="tdHipMMT">3/5</td>
+                                    <td class="p-3 editable" contenteditable="true">Enhanced core engagement and proximal quad activation. Can initiate against gravity.</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-3 font-semibold text-slate-850">Left Shoulder Flexion (MMT Scale)</td>
-                                    <td class="p-3 text-center text-slate-500">1/5 (Trace)</td>
-                                    <td class="p-3 text-center text-slate-500">2/5 (Gravity Eliminated)</td>
-                                    <td class="p-3 text-center bg-teal-50 text-teal-700 font-bold" id="tdShoulderMMT">2/5</td>
-                                    <td class="p-3">Trace muscle recruitment verified. Initiating anti-gravity elimination protocols.</td>
+                                    <td class="p-3 font-semibold text-slate-850 editable" contenteditable="true">Left Shoulder Flexion (MMT Scale)</td>
+                                    <td class="p-3 text-center text-slate-500 editable" contenteditable="true">1/5 (Trace)</td>
+                                    <td class="p-3 text-center text-slate-500 editable" contenteditable="true">2/5</td>
+                                    <td class="p-3 text-center bg-teal-50 text-teal-700 font-bold" id="tdShoulderMMT">3/5</td>
+                                    <td class="p-3 editable" contenteditable="true">Trace muscle recruitment verified. Moving against gravity with slight resistance.</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-3 font-semibold text-slate-850">Bilateral Bridging Hold</td>
-                                    <td class="p-3 text-center text-slate-500">Unable</td>
-                                    <td class="p-3 text-center text-slate-500">Required manual support</td>
-                                    <td class="p-3 text-center bg-teal-50 text-teal-700 font-bold" id="tdBridging">5s hold</td>
-                                    <td class="p-3">Steady static contraction of gluteals with minimal verbal cueing.</td>
+                                    <td class="p-3 font-semibold text-slate-850 editable" contenteditable="true">Bilateral Bridging Hold</td>
+                                    <td class="p-3 text-center text-slate-500 editable" contenteditable="true">Unable</td>
+                                    <td class="p-3 text-center text-slate-500 editable" contenteditable="true">5s hold</td>
+                                    <td class="p-3 text-center bg-teal-50 text-teal-700 font-bold" id="tdBridging">15s hold</td>
+                                    <td class="p-3 editable" contenteditable="true">Steady static contraction of gluteals with minimal verbal cueing. Good pelvic tilt.</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-3 font-semibold text-slate-850">Bed Rolling (To Right)</td>
-                                    <td class="p-3 text-center text-slate-500">Max Assist (75%)</td>
-                                    <td class="p-3 text-center text-slate-500">Mod Assist (50%)</td>
-                                    <td class="p-3 text-center bg-teal-50 text-teal-700 font-bold">Min Assist (25%)</td>
-                                    <td class="p-3">Effortless pull using sound right arm paired with diagonal trunk drive.</td>
+                                    <td class="p-3 font-semibold text-slate-850 editable" contenteditable="true">Bed Rolling (To Right)</td>
+                                    <td class="p-3 text-center text-slate-500 editable" contenteditable="true">Max Assist (75%)</td>
+                                    <td class="p-3 text-center text-slate-500 editable" contenteditable="true">Min Assist (25%)</td>
+                                    <td class="p-3 text-center bg-teal-50 text-teal-700 font-bold editable" contenteditable="true">Independent</td>
+                                    <td class="p-3 editable" contenteditable="true">Effortless pull using sound right arm paired with diagonal trunk drive.</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-3 font-semibold text-slate-850">Bed Rolling (To Left)</td>
-                                    <td class="p-3 text-center text-slate-500">Max Assist (100%)</td>
-                                    <td class="p-3 text-center text-slate-500">Max Assist (75%)</td>
-                                    <td class="p-3 text-center bg-teal-50 text-teal-700 font-bold">Mod Assist (50%)</td>
-                                    <td class="p-3">Gradually overcoming left neglect. Head orientation to hemiparetic side is improving.</td>
+                                    <td class="p-3 font-semibold text-slate-850 editable" contenteditable="true">Bed Rolling (To Left)</td>
+                                    <td class="p-3 text-center text-slate-500 editable" contenteditable="true">Max Assist (100%)</td>
+                                    <td class="p-3 text-center text-slate-500 editable" contenteditable="true">Mod Assist (50%)</td>
+                                    <td class="p-3 text-center bg-teal-50 text-teal-700 font-bold editable" contenteditable="true">Min Assist (25%)</td>
+                                    <td class="p-3 editable" contenteditable="true">Gradually overcoming left neglect. Head orientation to hemiparetic side is improving.</td>
                                 </tr>
                             </tbody>
                         </table>
+                        <!-- Hidden Add Row Button (Shown only on screen) -->
+                        <div class="p-2 bg-slate-50 border-t border-slate-200 text-center no-print">
+                            <button onclick="addTableRow()" class="text-[11px] font-bold text-teal-600 hover:text-teal-800 transition">
+                                <i class="fa-solid fa-plus-circle"></i> Add Custom Metric Row
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Section 4: Key Clinical Observations -->
                 <div class="space-y-4">
-                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide border-b border-slate-100 pb-2">
-                        <span class="w-5 h-5 bg-teal-50 text-teal-600 rounded-md flex items-center justify-center font-bold text-xs">4</span>
+                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide border-b border-slate-100 pb-2 editable" contenteditable="true">
+                        <span class="w-5 h-5 bg-teal-50 text-teal-600 rounded-md flex items-center justify-center font-bold text-xs" contenteditable="false">4</span>
                         Key Clinical Observations
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                         <div class="p-4 rounded-xl border border-slate-100 bg-slate-50">
-                            <span class="font-extrabold text-slate-800 uppercase text-[10px] tracking-wide block mb-1">Cognitive Engagement</span>
-                            <p class="text-slate-650 leading-relaxed">Esther shows deep cognitive dedication. Tactile cues (taps to left quads/glutes) immediately activate sensory motor integration.</p>
+                            <span class="font-extrabold text-slate-800 uppercase text-[10px] tracking-wide block mb-1 editable" contenteditable="true">Cognitive Engagement</span>
+                            <p class="text-slate-650 leading-relaxed editable" contenteditable="true">Esther shows deep cognitive dedication. Tactile cues (taps to left quads/glutes) immediately activate sensory motor integration.</p>
                         </div>
                         <div class="p-4 rounded-xl border border-slate-100 bg-slate-50">
-                            <span class="font-extrabold text-slate-800 uppercase text-[10px] tracking-wide block mb-1">Neglect & Attention</span>
-                            <p class="text-slate-650 leading-relaxed">Spatial left-side neglect is decreasing. She voluntarily turns her gaze leftward when prompted during core drills.</p>
+                            <span class="font-extrabold text-slate-800 uppercase text-[10px] tracking-wide block mb-1 editable" contenteditable="true">Neglect & Attention</span>
+                            <p class="text-slate-650 leading-relaxed editable" contenteditable="true">Spatial left-side neglect is significantly decreased over 30 days. She voluntarily turns gaze leftward when prompted during core drills.</p>
                         </div>
                         <div class="p-4 rounded-xl border border-slate-100 bg-slate-50">
-                            <span class="font-extrabold text-slate-800 uppercase text-[10px] tracking-wide block mb-1">Fatigue & Tone Management</span>
-                            <p class="text-slate-650 leading-relaxed">Subtle elbow/calf hypertonia spikes with fatigue. Workloads are strictly timed to morning thresholds to avoid spastic pattern locks.</p>
+                            <span class="font-extrabold text-slate-800 uppercase text-[10px] tracking-wide block mb-1 editable" contenteditable="true">Fatigue & Tone Management</span>
+                            <p class="text-slate-650 leading-relaxed editable" contenteditable="true">Subtle elbow/calf hypertonia spikes with fatigue. Workloads are strictly timed to morning thresholds to avoid spastic pattern locks.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Section 5: Strategic Recommendations & Next Steps -->
                 <div class="space-y-6 page-break">
-                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide border-b border-slate-100 pb-2">
-                        <span class="w-5 h-5 bg-teal-50 text-teal-600 rounded-md flex items-center justify-center font-bold text-xs">5</span>
+                    <h3 class="text-sm font-extrabold text-slate-900 flex items-center gap-2 uppercase tracking-wide border-b border-slate-100 pb-2 editable" contenteditable="true">
+                        <span class="w-5 h-5 bg-teal-50 text-teal-600 rounded-md flex items-center justify-center font-bold text-xs" contenteditable="false">5</span>
                         Recommendations & Next Steps
                     </h3>
 
-                    <!-- Sub-section A: Bed-Based Exercise Progression Builder -->
                     <div class="space-y-4">
-                        <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-                            A. Bed-Based Exercise Progressions (Next 14 Days)
+                        <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2 editable" contenteditable="true">
+                            <span class="w-2 h-2 rounded-full bg-teal-600" contenteditable="false"></span>
+                            A. Transition to Upright (Next 14 Days)
                         </h4>
                         
-                        <!-- Interactive Checklist/Card System -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- Card 1 -->
                             <div class="p-4 border border-slate-150 hover:border-teal-200 hover:bg-teal-50/10 rounded-2xl transition space-y-2.5 flex items-start gap-3">
-                                <input type="checkbox" class="mt-1 w-4.5 h-4.5 accent-teal-600 rounded cursor-pointer">
-                                <div class="space-y-1">
-                                    <span class="text-[9px] font-extrabold text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full uppercase">HIP STABILITY</span>
-                                    <h5 class="text-xs font-bold text-slate-800">Assisted Straight Leg Raises</h5>
-                                    <p class="text-[11px] text-slate-500 leading-relaxed">Progressing from 0° to 30° to stimulate trunk stability and baseline hip flexor recruitment. Ensure knee alignment.</p>
-                                    <p class="text-[10px] font-semibold text-slate-600">Target: <span class="text-teal-600">2 Sets x 8 Reps (Left Side)</span></p>
+                                <input type="checkbox" class="mt-1 w-4.5 h-4.5 accent-teal-600 rounded cursor-pointer no-print">
+                                <div class="space-y-1 w-full">
+                                    <span class="text-[9px] font-extrabold text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full uppercase editable" contenteditable="true">TRUNK CONTROL</span>
+                                    <h5 class="text-xs font-bold text-slate-800 editable" contenteditable="true">Edge of Bed Sitting Stability</h5>
+                                    <p class="text-[11px] text-slate-500 leading-relaxed editable" contenteditable="true">Unsupported sitting practice focusing on lateral weight shifts. Ensuring feet are flat on floor for proprioceptive grounding.</p>
+                                    <p class="text-[10px] font-semibold text-slate-600 editable" contenteditable="true">Target: <span class="text-slate-800">2 minutes hold x 3 sets</span></p>
                                 </div>
                             </div>
+                            
                             <!-- Card 2 -->
                             <div class="p-4 border border-slate-150 hover:border-teal-200 hover:bg-teal-50/10 rounded-2xl transition space-y-2.5 flex items-start gap-3">
-                                <input type="checkbox" class="mt-1 w-4.5 h-4.5 accent-teal-600 rounded cursor-pointer">
-                                <div class="space-y-1">
-                                    <span class="text-[9px] font-extrabold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full uppercase">POSTERIOR CHAIN</span>
-                                    <h5 class="text-xs font-bold text-slate-800">Resisted Bilateral Bridging</h5>
-                                    <p class="text-[11px] text-slate-500 leading-relaxed">Introducing ultra-light loops around knees to recruit hip abductors, gluteus maximus, and control hip external splay.</p>
-                                    <p class="text-[10px] font-semibold text-slate-600">Target: <span class="text-indigo-600">3 Sets x 5s Iso-Hold</span></p>
-                                </div>
-                            </div>
-                            <!-- Card 3 -->
-                            <div class="p-4 border border-slate-150 hover:border-teal-200 hover:bg-teal-50/10 rounded-2xl transition space-y-2.5 flex items-start gap-3">
-                                <input type="checkbox" class="mt-1 w-4.5 h-4.5 accent-teal-600 rounded cursor-pointer">
-                                <div class="space-y-1">
-                                    <span class="text-[9px] font-extrabold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full uppercase">SHOULDER GIRDLE</span>
-                                    <h5 class="text-xs font-bold text-slate-800">Scapular Protraction & Retraction</h5>
-                                    <p class="text-[11px] text-slate-500 leading-relaxed">Active-assisted supine reaches targeting the serratus anterior to maintain joint integrity and prevent shoulder subluxation.</p>
-                                    <p class="text-[10px] font-semibold text-slate-600">Target: <span class="text-amber-600">2 Sets x 10 Guided Reps</span></p>
-                                </div>
-                            </div>
-                            <!-- Card 4 -->
-                            <div class="p-4 border border-slate-150 hover:border-teal-200 hover:bg-teal-50/10 rounded-2xl transition space-y-2.5 flex items-start gap-3">
-                                <input type="checkbox" class="mt-1 w-4.5 h-4.5 accent-teal-600 rounded cursor-pointer">
-                                <div class="space-y-1">
-                                    <span class="text-[9px] font-extrabold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full uppercase">DORSIFLEXION</span>
-                                    <h5 class="text-xs font-bold text-slate-800">Tibialis Anterior Stimulation</h5>
-                                    <p class="text-[11px] text-slate-500 leading-relaxed">Ankle dorsiflexion exercises with brief quick-stretch trigger patterns at the base of the foot to offset hypertonic drop foot.</p>
-                                    <p class="text-[10px] font-semibold text-slate-600">Target: <span class="text-rose-600">15 Reps (with sensory tactile cues)</span></p>
+                                <input type="checkbox" class="mt-1 w-4.5 h-4.5 accent-teal-600 rounded cursor-pointer no-print">
+                                <div class="space-y-1 w-full">
+                                    <span class="text-[9px] font-extrabold text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full uppercase editable" contenteditable="true">MOTOR CONTROL</span>
+                                    <h5 class="text-xs font-bold text-slate-800 editable" contenteditable="true">Seated Knee Extensions</h5>
+                                    <p class="text-[11px] text-slate-500 leading-relaxed editable" contenteditable="true">Active assistive extension of the left knee while seated at the edge of the bed to prepare quadriceps for sit-to-stand.</p>
+                                    <p class="text-[10px] font-semibold text-slate-600 editable" contenteditable="true">Target: <span class="text-slate-800">10 reps x 2 sets</span></p>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Sub-section B: Bed Care & Positioning Guidelines (For Caregivers) -->
-                    <div class="space-y-4">
-                        <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-                            B. Caregiver Positioning & Bedside Safety Instructions
-                        </h4>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Visual Guide Left (Detailed Positioning Cards) -->
-                            <div class="space-y-3.5">
-                                <div class="flex gap-3 bg-teal-50/30 p-3.5 border border-teal-100 rounded-xl">
-                                    <span class="w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0">A</span>
-                                    <div class="space-y-1">
-                                        <h5 class="text-xs font-bold text-slate-800">Scapular Protection Cushioning</h5>
-                                        <p class="text-[11px] text-slate-500 leading-relaxed">Never drag Esther by her paretic left arm. Prop a supportive soft pillow underneath the scapula and left elbow to encourage internal rotation alignment.</p>
-                                    </div>
-                                </div>
-                                <div class="flex gap-3 bg-slate-50 p-3.5 border border-slate-150 rounded-xl">
-                                    <span class="w-6 h-6 rounded-full bg-slate-600 text-white flex items-center justify-center font-bold text-xs shrink-0">B</span>
-                                    <div class="space-y-1">
-                                        <h5 class="text-xs font-bold text-slate-800">Trochanter Hip Alignment</h5>
-                                        <p class="text-[11px] text-slate-500 leading-relaxed">Use a trochanter roll (tightly rolled bath towel) alongside the outer left thigh. This forces neutral leg posture, blocking valgus hip drop.</p>
-                                    </div>
-                                </div>
-                                <div class="flex gap-3 bg-slate-50 p-3.5 border border-slate-150 rounded-xl">
-                                    <span class="w-6 h-6 rounded-full bg-slate-600 text-white flex items-center justify-center font-bold text-xs shrink-0">C</span>
-                                    <div class="space-y-1">
-                                        <h5 class="text-xs font-bold text-slate-800">Float Heels & Rotational schedule</h5>
-                                        <p class="text-[11px] text-slate-500 leading-relaxed">Keep heels clear from flat sheet contact using micro-wedges. Maintain structural turning schedule every 2-3 hours.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Visual Guide Right (Interactive SVG Posture Diagram) -->
-                            <div class="border border-slate-200 rounded-2xl p-4 bg-white flex flex-col justify-between">
-                                <div class="flex justify-between items-center pb-2 border-b border-slate-100 mb-3">
-                                    <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Correct Supine Bed Posture</span>
-                                    <span class="text-[9px] bg-emerald-100 text-emerald-800 font-semibold px-2 py-0.5 rounded-full">Joint Safe Zone</span>
-                                </div>
-                                
-                                <!-- Elegant interactive schematic of post-stroke support -->
-                                <div class="relative flex-1 min-h-[140px] flex items-center justify-center bg-slate-50 rounded-xl border border-slate-100 p-2 overflow-hidden">
-                                    <svg viewBox="0 0 400 180" class="w-full h-auto max-h-[160px]">
-                                        <!-- Bed base line -->
-                                        <line x1="10" y1="140" x2="390" y2="140" stroke="#cbd5e1" stroke-width="4" stroke-linecap="round"/>
-                                        
-                                        <!-- Main Patient Body Vector Profile -->
-                                        <!-- Pillow for Head -->
-                                        <path d="M 40 100 Q 55 100 65 115 Q 55 130 40 130 Z" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1.5"/>
-                                        <!-- Head -->
-                                        <circle cx="60" cy="108" r="14" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
-                                        <!-- Torso -->
-                                        <path d="M 74 114 L 180 120 L 180 140 L 74 140 Z" fill="#f1f5f9" stroke="#64748b" stroke-width="2" stroke-linejoin="round"/>
-                                        <!-- Right Hip & Leg (Behind) -->
-                                        <path d="M 174 125 L 260 122 L 340 128" fill="none" stroke="#94a3b8" stroke-width="6" stroke-linecap="round"/>
-                                        <!-- Hemiparetic Left Hip & Leg (Foreground) -->
-                                        <path d="M 174 125 L 255 116 L 335 125" fill="none" stroke="#0d9488" stroke-width="8" stroke-linecap="round"/>
-                                        <!-- Shoulder Pillow Support (Indicator) -->
-                                        <ellipse cx="105" cy="133" rx="18" ry="7" fill="#2dd4bf" fill-opacity="0.25" stroke="#0d9488" stroke-width="1.5" stroke-dasharray="2 2"/>
-                                        <!-- Trochanter Roll (Indicator) -->
-                                        <circle cx="178" cy="133" r="7" fill="#0d9488" fill-opacity="0.8"/>
-                                        <text x="178" y="118" font-size="8" font-weight="bold" fill="#0d9488" text-anchor="middle">Trochanter Roll</text>
-                                        <!-- Heel Elevation Pillow -->
-                                        <path d="M 315 130 Q 330 130 345 138" fill="none" stroke="#2dd4bf" stroke-width="5" stroke-linecap="round"/>
-                                        <circle cx="330" cy="136" r="4" fill="#0d9488" fill-opacity="0.4"/>
-                                        
-                                        <!-- Diagram Annotation Labels -->
-                                        <text x="105" y="152" font-size="8" font-weight="bold" fill="#0f172a" text-anchor="middle">Scapular Prop</text>
-                                        <text x="330" y="152" font-size="8" font-weight="bold" fill="#0f172a" text-anchor="middle">Float Heels</text>
-                                    </svg>
-                                </div>
-                                <p class="text-[10px] text-slate-400 mt-2 text-center">Highlighted segments illustrate pressure deflection & joint security nodes.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- EP Signature Authorization Block -->
-                <div class="pt-6 border-t border-slate-200 mt-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs">
-                    <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lead Clinician Authorization</p>
-                        <p class="font-bold text-slate-800 mt-0.5" id="lblSigName">Nimrod Kiprotich, EP</p>
-                        <p class="text-slate-500">Board Registered Exercise Physiologist (Post-Stroke Care specialist)</p>
-                    </div>
-                    <div class="text-left md:text-right">
-                        <div class="inline-block border-b-2 border-slate-300 w-36 h-8 mb-1"></div>
-                        <p class="text-slate-400 text-[10px] uppercase">Clinical EP Signature Verified</p>
                     </div>
                 </div>
 
             </div>
         </article>
-
     </main>
 
-    <!-- Custom Toast Container -->
-    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-2.5 bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-lg no-print">
-        <span id="toastIcon" class="text-emerald-400"><i class="fa-solid fa-circle-check"></i></span>
-        <span id="toastMsg">Changes saved!</span>
+    <!-- Custom Toast Notification Box -->
+    <div id="toastBox" class="fixed bottom-6 right-6 bg-slate-900 text-white px-5 py-4 rounded-xl shadow-2xl transform transition-all duration-300 translate-y-20 opacity-0 z-50 flex items-start gap-3 max-w-sm pointer-events-none">
+        <i class="fa-solid fa-circle-check text-teal-400 mt-0.5 text-lg"></i>
+        <span id="toastMsg" class="text-sm font-medium leading-relaxed"></span>
     </div>
 
+    <!-- Interactive Dashboard Script -->
     <script>
-        // Store report metadata globally to manage states
-        let clientData = {
-            epName: "Nimrod Kiprotich, EP",
-            clientName: "Esther Limo",
-            clientAge: "83",
-            clientGender: "Female",
-            clientDiagnosis: "Post-Stroke Left-Side Hemiparesis (Right Hemisphere CVA)",
-            reportDate: "2026-06-14",
-            metrics: {
-                shoulderFlexDeg: 85,
-                hipFlexMMT: 2.0,
-                shoulderMMT: 2.0,
-                bridgeHoldSec: 5
-            }
-        };
+        // Chart Objects
+        let mmtChart, romChart;
 
-        // Charts handles
-        let mmtChartInstance = null;
-        let romChartInstance = null;
-
-        // Initialize components on load
-        window.onload = function() {
-            initCharts();
-            updateChartAndTable();
-            updateReportMetaData();
-        };
-
-        // Custom responsive alert/toast feedback
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMsg');
-            const toastIcon = document.getElementById('toastIcon');
-
-            toastMsg.innerText = message;
-            if (type === 'success') {
-                toastIcon.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i>`;
-            } else {
-                toastIcon.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-400"></i>`;
-            }
-
+        // Custom Toast Function (Replaces window.alert)
+        function showToast(message) {
+            const toast = document.getElementById('toastBox');
+            const msgElement = document.getElementById('toastMsg');
+            
+            msgElement.innerText = message;
             toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
+            
             setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
                 toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+            }, 5000);
         }
 
-        // Initialize Chart.js with responsive datasets
-        function initCharts() {
-            // MMT Bar Chart Definition
+        // Form Formatting Dates
+        function formatDate(dateStr) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const d = new Date(dateStr);
+            // Handling timezone issues roughly
+            d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+            return d.toLocaleDateString(undefined, options);
+        }
+
+        // Add Table Row Function to make it extremely flexible for the user
+        function addTableRow() {
+            const tbody = document.getElementById('metricsTableBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="p-3 font-semibold text-slate-850 editable" contenteditable="true">New Custom Metric</td>
+                <td class="p-3 text-center text-slate-500 editable" contenteditable="true">-</td>
+                <td class="p-3 text-center text-slate-500 editable" contenteditable="true">-</td>
+                <td class="p-3 text-center bg-teal-50 text-teal-700 font-bold editable" contenteditable="true">-</td>
+                <td class="p-3 editable" contenteditable="true">Add notes here...</td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        // Sync Sidebar Metadata Inputs with Document Visuals
+        function updateReportMetaData() {
+            document.getElementById('lblEPName').innerText = document.getElementById('epName').value;
+            document.getElementById('lblClientName').innerText = document.getElementById('clientName').value;
+            document.getElementById('lblClientAge').innerText = document.getElementById('clientAge').value;
+            document.getElementById('lblClientGender').innerText = document.getElementById('clientGender').value;
+            document.getElementById('lblClientDiagnosis').innerText = document.getElementById('clientDiagnosis').value;
+            
+            const rawDate = document.getElementById('reportDate').value;
+            if(rawDate) {
+                document.getElementById('printReportDate').innerText = formatDate(rawDate);
+            }
+        }
+
+        // Sync Sliders to Texts, Tables, and Charts
+        function updateChartAndTable() {
+            // Get Slider Values
+            const shoulderDeg = document.getElementById('sliderShoulder').value;
+            const hipMMT = document.getElementById('sliderHip').value;
+            const shoulderMMT = document.getElementById('sliderShoulderMMT').value;
+            const bridge = document.getElementById('sliderBridge').value;
+
+            // Update Labels above sliders
+            document.getElementById('valShoulderDeg').innerText = shoulderDeg + '°';
+            document.getElementById('valHipMMT').innerText = hipMMT + '/5';
+            document.getElementById('valShoulderMMT').innerText = shoulderMMT + '/5';
+            document.getElementById('valBridgeHold').innerText = bridge + 's';
+
+            // Update Table Cells inside document
+            document.getElementById('tdShoulderFlex').innerText = shoulderDeg + '°';
+            document.getElementById('tdHipMMT').innerText = hipMMT + '/5';
+            document.getElementById('tdShoulderMMT').innerText = shoulderMMT + '/5';
+            document.getElementById('tdBridging').innerText = bridge + 's hold';
+
+            // Update MMT Chart (Baseline vs Midpoint vs Day 30)
+            if (mmtChart) {
+                mmtChart.data.datasets[0].data = [1, 2, parseFloat(hipMMT)];      // Hip MMT progression
+                mmtChart.data.datasets[1].data = [1, 2, parseFloat(shoulderMMT)]; // Shoulder MMT progression
+                mmtChart.update();
+            }
+
+            // Update ROM Chart
+            if (romChart) {
+                romChart.data.datasets[0].data = [45, 75, parseInt(shoulderDeg)]; // ROM progression
+                romChart.update();
+            }
+        }
+
+        // Initialize Chart.js
+        window.onload = function() {
+            // Update initially formatted date
+            updateReportMetaData();
+
+            // Set global chart fonts
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#64748b';
+
+            // MMT Bar Chart
             const ctxMMT = document.getElementById('chartMMT').getContext('2d');
-            mmtChartInstance = new Chart(ctxMMT, {
+            mmtChart = new Chart(ctxMMT, {
                 type: 'bar',
                 data: {
-                    labels: ['Left Hip Flexion', 'Left Shoulder Flexion'],
+                    labels: ['Day 1', 'Day 15', 'Day 30'],
                     datasets: [
                         {
-                            label: 'Day 1 Baseline',
-                            data: [1, 1],
-                            backgroundColor: 'rgba(203, 213, 225, 0.65)',
-                            borderColor: 'rgba(148, 163, 184, 0.8)',
-                            borderWidth: 1,
-                            borderRadius: 6
+                            label: 'L. Hip MMT',
+                            data: [1, 2, 3],
+                            backgroundColor: 'rgba(13, 148, 136, 0.8)', // Teal 600
+                            borderRadius: 4
                         },
                         {
-                            label: 'Day 14 Progress',
-                            data: [clientData.metrics.hipFlexMMT, clientData.metrics.shoulderMMT],
-                            backgroundColor: 'rgba(13, 148, 136, 0.85)',
-                            borderColor: 'rgba(13, 148, 136, 1)',
-                            borderWidth: 1.5,
-                            borderRadius: 6
+                            label: 'L. Shoulder MMT',
+                            data: [1, 2, 3],
+                            backgroundColor: 'rgba(148, 163, 184, 0.6)', // Slate 400
+                            borderRadius: 4
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: true, position: 'bottom', labels: { boxWidth: 12, font: { size: 9, weight: 'bold' } } }
-                    },
                     scales: {
-                        y: { min: 0, max: 5, ticks: { stepSize: 1, font: { size: 9 } } },
-                        x: { ticks: { font: { size: 9, weight: 'bold' } } }
+                        y: { beginAtZero: true, max: 5, ticks: { stepSize: 1 } }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
                     }
                 }
             });
 
-            // Shoulder Flexion ROM Chart Definition (Baseline vs Mid vs Current)
+            // ROM Line Chart
             const ctxROM = document.getElementById('chartROM').getContext('2d');
-            romChartInstance = new Chart(ctxROM, {
+            romChart = new Chart(ctxROM, {
                 type: 'line',
                 data: {
-                    labels: ['Day 1', 'Day 7', 'Day 14'],
+                    labels: ['Day 1', 'Day 15', 'Day 30'],
                     datasets: [{
-                        label: 'Flexion Angle (°)',
-                        data: [45, 65, clientData.metrics.shoulderFlexDeg],
-                        backgroundColor: 'rgba(20, 184, 166, 0.1)',
-                        borderColor: 'rgba(13, 148, 136, 1)',
+                        label: 'Flexion Degrees (°)',
+                        data: [45, 75, 110],
+                        borderColor: '#0d9488', // Teal 600
+                        backgroundColor: 'rgba(13, 148, 136, 0.1)',
                         borderWidth: 3,
-                        pointBackgroundColor: 'rgba(13, 148, 136, 1)',
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                        tension: 0.25,
-                        fill: true
+                        pointBackgroundColor: '#0f766e',
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.3
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
                     scales: {
-                        y: { min: 0, max: 180, ticks: { stepSize: 30, font: { size: 9 } } },
-                        x: { ticks: { font: { size: 9, weight: 'bold' } } }
+                        y: { beginAtZero: true, max: 180 }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
                     }
                 }
             });
-        }
 
-        // Sync sliders with chart instances and the metrics table
-        function updateChartAndTable() {
-            // Read slider values
-            const shoulderFlex = parseInt(document.getElementById('sliderShoulder').value);
-            const hipMMT = parseFloat(document.getElementById('sliderHip').value);
-            const shoulderMMT = parseFloat(document.getElementById('sliderShoulderMMT').value);
-            const bridgeHold = parseInt(document.getElementById('sliderBridge').value);
-
-            // Update label readouts
-            document.getElementById('valShoulderDeg').innerText = shoulderFlex + '°';
-            document.getElementById('valHipMMT').innerText = hipMMT + '/5';
-            document.getElementById('valShoulderMMT').innerText = shoulderMMT + '/5';
-            document.getElementById('valBridgeHold').innerText = bridgeHold + 's';
-
-            // Update report visual layout tables
-            document.getElementById('tdShoulderFlex').innerText = shoulderFlex + '°';
-            document.getElementById('tdHipMMT').innerText = hipMMT + '/5';
-            document.getElementById('tdShoulderMMT').innerText = shoulderMMT + '/5';
-            document.getElementById('tdBridging').innerText = bridgeHold === 0 ? 'Unable' : (bridgeHold + 's hold');
-
-            // Save variables inside state
-            clientData.metrics.shoulderFlexDeg = shoulderFlex;
-            clientData.metrics.hipFlexMMT = hipMMT;
-            clientData.metrics.shoulderMMT = shoulderMMT;
-            clientData.metrics.bridgeHoldSec = bridgeHold;
-
-            // Reflect changes live on Chart.js instances
-            if (mmtChartInstance && romChartInstance) {
-                mmtChartInstance.data.datasets[1].data = [hipMMT, shoulderMMT];
-                mmtChartInstance.update('none'); // Update without full layout reflow animation
-
-                romChartInstance.data.datasets[0].data = [45, 65, shoulderFlex];
-                romChartInstance.update('none');
-            }
-        }
-
-        // Synchronize manual form fields into report structure
-        function updateReportMetaData() {
-            clientData.epName = document.getElementById('epName').value;
-            clientData.clientName = document.getElementById('clientName').value;
-            clientData.clientAge = document.getElementById('clientAge').value;
-            clientData.clientGender = document.getElementById('clientGender').value;
-            clientData.clientDiagnosis = document.getElementById('clientDiagnosis').value;
-            
-            const rawDate = document.getElementById('reportDate').value;
-            if(rawDate) {
-                const dateParts = rawDate.split('-');
-                if(dateParts.length === 3) {
-                    const formattedDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2])
-                        .toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-                    clientData.reportDate = formattedDate;
-                }
-            }
-
-            // Sync visual text labels instantly
-            document.getElementById('lblClientName').innerText = clientData.clientName;
-            document.getElementById('lblClientAge').innerText = clientData.clientAge;
-            document.getElementById('lblClientGender').innerText = clientData.clientGender;
-            document.getElementById('lblClientDiagnosis').innerText = clientData.clientDiagnosis;
-            document.getElementById('lblEPName').innerText = clientData.epName;
-            document.getElementById('lblSigName').innerText = clientData.epName;
-            document.getElementById('printReportDate').innerText = clientData.reportDate;
-        }
+            // Initial Sync
+            updateChartAndTable();
+        };
     </script>
 </body>
 </html>
